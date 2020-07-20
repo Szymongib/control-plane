@@ -15,6 +15,7 @@ var planIDsMapping = map[string]string{
 	AzurePlanName:     AzurePlanID,
 	AzureLitePlanName: AzureLitePlanID,
 	GCPPlanName:       GCPPlanID,
+	GCPTrialPlanName: GCPTrialPlanID,
 }
 
 type KymaEnvironmentBroker struct {

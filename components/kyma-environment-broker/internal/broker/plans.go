@@ -255,6 +255,24 @@ var Plans = map[string]struct {
 		},
 		provisioningRawSchema: GCPSchema([]string{"n1-standard-2", "n1-standard-4", "n1-standard-8", "n1-standard-16", "n1-standard-32", "n1-standard-64"}),
 	},
+	GCPTrialPlanID: {
+		PlanDefinition: domain.ServicePlan{
+			ID:          GCPTrialPlanID,
+			Name:        GCPTrialPlanName,
+			Description: "GCPTrial",
+			Metadata: &domain.ServicePlanMetadata{
+				DisplayName: "GCPTrial",
+			},
+			Schemas: &domain.ServiceSchemas{
+				Instance: domain.ServiceInstanceSchema{
+					Create: domain.Schema{
+						Parameters: make(map[string]interface{}),
+					},
+				},
+			},
+		},
+		provisioningRawSchema: GCPSchema([]string{"n1-standard-2", "n1-standard-4", "n1-standard-8", "n1-standard-16", "n1-standard-32", "n1-standard-64"}),
+	},
 	AzurePlanID: {
 		PlanDefinition: domain.ServicePlan{
 			ID:          AzurePlanID,
