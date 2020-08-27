@@ -8,12 +8,15 @@ To make it easier to provision Shoot cluster and install Kyma from templates, Pr
 
 To render the templates with required values, run:
 ```bash
-go run ./cmd/template render --shoot=my-shoot --project=my-gardener-project --secret=my-azure-secret
+go run ./cmd/template render --shoot=my-shoot --project=my-gardener-project --secret=my-azure-secret \
+ --oidc-issuer-url=[ISSUER_URL] --oidc-client-id=[CLIENT_ID] --oidc-client-secret=[CLIENT_SECRET] \
+ --oidc-admin-group=[ADMIN_GROUP]
 ``` 
 
 To Provision the cluster apply generated files to the Gardener Project:
 ```bash
-kubectl apply -f ./templates-rendered/
+kubectl apply -f ./templates-rendered/shoot.yaml
+kubectl apply -f ./templates-rendered/cluster-bom.yaml
 ```
 
 To see additional parameters that can be used with `render` command, run:

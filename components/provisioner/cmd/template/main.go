@@ -25,11 +25,7 @@ func main() {
 			Aliases: []string{"gen"},
 			Usage:   "Generate Shoot template",
 			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "provider",
-					Value: "azure",
-					Usage: "Underlying cloud provider for Gardener to use",
-				},
+				&cli.StringFlag{Name: "provider", Value: "azure", Usage: "Underlying cloud provider for Gardener to use"},
 				&cli.PathFlag{
 					Name:    "out",
 					Aliases: []string{"o"},
@@ -47,37 +43,19 @@ func main() {
 			Name:  "render",
 			Usage: "Render templates with provided values",
 			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "shoot",
-					Value: "my-shoot",
-					Usage: "Name of the Shoot",
-				},
-				&cli.StringFlag{
-					Name:     "project",
-					Required: true,
-					Usage:    "Name of the Gardener project",
-				},
-				&cli.StringFlag{
-					Name:     "secret",
-					Required: true,
-					Usage:    "Name of the Gardener secret",
-				},
-				&cli.StringFlag{
-					Name:  "region",
-					Value: "westeurope",
-					Usage: "Region in which cluster should be deployed. One of: northeurope, westeurope, centralus, westus2",
-				},
-				&cli.PathFlag{
-					Name:  "dir",
-					Value: templatesDir,
-					Usage: "Directory containing the templates",
-				},
-				&cli.PathFlag{
-					Name:    "out",
-					Aliases: []string{"o"},
-					Value:   "templates-rendered",
-					Usage:   "Output directory to which resources will be rendered",
-				},
+				&cli.StringFlag{Name: "shoot", Value: "my-shoot", Usage: "Name of the Shoot"},
+				&cli.StringFlag{Name: "project", Required: true, Usage: "Name of the Gardener project"},
+				&cli.StringFlag{Name: "secret", Required: true, Usage: "Name of the Gardener secret"},
+				&cli.StringFlag{Name: "region", Value: "westeurope", Usage: "Region in which cluster should be deployed. One of: northeurope, westeurope, centralus, westus2"},
+				&cli.StringFlag{Name: "gardener-domain", Value: "live.k8s.ondemand.com", Usage: "Gardener environment domain"},
+				&cli.StringFlag{Name: "oidc-issuer-url", Required: true, Usage: "OIDC issuer URL"},
+				&cli.StringFlag{Name: "oidc-client-id", Required: true, Usage: "Client Id used for authentication"},
+				&cli.StringFlag{Name: "oidc-client-secret", Required: true, Usage: "Client Secret used for authentication"},
+				&cli.StringFlag{Name: "oidc-admin-group", Value: "runtimeAdmin", Usage: "OIDC Admins group"},
+				&cli.StringFlag{Name: "oidc-admin-group-namespace", Value: "runtimeNamespaceAdmin", Usage: "OIDC Admins group namespace"},
+				&cli.StringFlag{Name: "oidc-developer-group", Value: "runtimeDeveloper", Usage: "OIDC developer group"},
+				&cli.PathFlag{Name: "dir", Value: templatesDir, Usage: "Directory containing the templates"},
+				&cli.PathFlag{Name: "out", Aliases: []string{"o"}, Value: "templates-rendered", Usage: "Output directory to which resources will be rendered"},
 			},
 			Action: func(c *cli.Context) error {
 				values := templates.Values{
@@ -85,6 +63,15 @@ func main() {
 					ProjectName:        c.String("project"),
 					GardenerSecretName: c.String("secret"),
 					Region:             c.String("region"),
+					GardenerDomain:     c.String("gardener-domain"),
+					OIDC: templates.OIDCConfig{
+						IssuerURL:           c.String("oidc-issuer-url"),
+						ClientId:            c.String("oidc-client-id"),
+						ClientSecret:        c.String("oidc-client-secret"),
+						AdminGroup:          c.String("oidc-admin-group"),
+						AdminGroupNamespace: c.String("oidc-admin-group-namespace"),
+						DeveloperGroup:      c.String("oidc-developer-group"),
+					},
 				}
 
 				inPath := c.Path("dir")

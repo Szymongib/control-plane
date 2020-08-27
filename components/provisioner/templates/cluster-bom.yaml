@@ -1,21 +1,49 @@
 apiVersion: "hub.k8s.sap.com/v1"
 kind: ClusterBom
 metadata:
+  # only lowercase, digits, dot (".")
   name: {{ .ShootName }}
+  namespace: garden-{{ .ProjectName }}
 spec:
   secretRef: {{ .ShootName }}.kubeconfig
   applicationConfigs:
-  - id: kyma
-    configType: helm
-    readyRequirements:
-      jobs:
-      - name: kyma-initializer-retrieve-info
-        namespace: kyma-installer
-    typeSpecificData:
-      catalogAccess:
-        chartName: "kyma"
-        repo: "sap-incubator"
-        chartVersion: "0.5.0-1.14.0"    
-      installName: "kyma"
-      installTimeout: 1000
-      namespace: "default"
+      - id: kyma
+        configType: helm
+        values:
+          components:
+            cluster-users:
+              overrides:
+                "global.kymaRuntime.adminGroup": {{ .OIDC.AdminGroup }}
+                "global.kymaRuntime.namespaceAdminGroup": {{ .OIDC.AdminGroupNamespace }}
+                "global.kymaRuntime.developerGroup": {{ .OIDC.DeveloperGroup }}
+            dex:
+              enabled: true
+              overrides:
+                "dex.useStaticConnector": "false"
+                connectors: |-
+                  - type: oidc
+                    id: ias
+                    name: SAP IAS
+                    config:
+                      issuer: {{ .OIDC.IssuerURL }}
+                      clientID: {{ .OIDC.ClientId }}'
+                      clientSecret: {{ .OIDC.ClientSecret }}
+                      redirectURI: https://dex.{{ .ShootName }}.{{ .ProjectName }}.shoot.{{ .GardenerDomain }}/callback
+                      scopes:
+                      - openid
+                      insecureSkipEmailVerified: true
+                      insecureEnableGroups: true
+                      userIdKey: email
+              secretOverrides: {}
+        readyRequirements:
+          jobs:
+            - name: kyma-initializer-retrieve-info
+              namespace: kyma-installer
+        typeSpecificData:
+          catalogAccess:
+            chartName: "kyma"
+            repo: "sap-incubator"
+            chartVersion: "0.5.0-1.14.0"
+          installName: "kyma"
+          installTimeout: 30
+          namespace: "default"
